@@ -1,4 +1,6 @@
-use crate::components::{ControlTorque, PidController, Rod};
+use std::f32::consts::{FRAC_PI_4, PI};
+
+use crate::components::{ControlTorque, PidController, PidGains, PidState, Rod};
 use bevy::prelude::*;
 
 pub fn setup_camera(mut commands: Commands) {
@@ -10,16 +12,19 @@ pub fn setup_gizmos(mut config_store: ResMut<GizmoConfigStore>) {
     config.line.width = 4.0;
 }
 
-pub fn setup_rod(mut commands: Commands) {
-    // Spawn a rod with an initial deflection angle (e.g. 45 degrees / pi/4) so it swings
-    commands.spawn(Rod::new(1.0, 1.0, std::f32::consts::FRAC_PI_4 * 0.1, 0.0));
-}
-
-// TODO: use sensible starting points, too lazy to input now
 pub fn setup_controlled_rod(mut commands: Commands) {
     commands.spawn((
-        Rod::default(),
-        PidController::default(),
+        Rod::new(1.0, 1.0, PI + 0.5, 0.0),
+        PidController::new(
+            1.0,
+            PI,
+            PidGains {
+                kp: 5.0,
+                ki: 1.0,
+                kd: 0.0,
+            },
+            PidState::default(),
+        ),
         ControlTorque::default(),
     ));
 }

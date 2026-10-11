@@ -1,7 +1,4 @@
-use crate::{
-    components::{ControlTorque, PidController, PidGains, PidState, Rod},
-    systems::verlet_step_with_torque,
-};
+use crate::components::{ControlTorque, PidController, PidGains, PidState, Rod};
 use bevy::prelude::*;
 
 pub fn pid_controller_system(
@@ -13,6 +10,7 @@ pub fn pid_controller_system(
     for (rod, mut controller, mut torque) in query.iter_mut() {
         // Pure PID calculation
         let (computed_torque, new_state) = pid_step(
+            controller.max_torque,
             rod.state.theta,
             controller.target_theta,
             controller.state,
@@ -29,6 +27,7 @@ pub fn pid_controller_system(
 }
 
 pub fn pid_step(
+    max_torque: f32,
     current_angle: f32,
     target_angle: f32,
     state: PidState,
@@ -48,8 +47,8 @@ pub fn pid_step(
     };
 
     // PID torque output: u = Kp*e + Ki*∫e dt + Kd*(de/dt)
-    let u = (gains.kp * error) + (gains.ki * new_integral) + (gains.kd * derivative);
-
+    let theoretical_u = (gains.kp * error) + (gains.ki * new_integral) + (gains.kd * derivative);
+    let u = theoretical_u.min(max_torque);
     let next_state = PidState {
         integral: new_integral,
         prev_error: error,

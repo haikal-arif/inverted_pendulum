@@ -15,9 +15,11 @@ pub struct PendulumPlugin;
 impl Plugin for PendulumPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(Time::<Fixed>::from_seconds(0.01))
-            // TODO: use controlled rod setup after giving sensible initial values
-            .add_systems(Startup, (setup_camera, setup_gizmos, setup_rod))
-            .add_systems(FixedUpdate, rod_physics_system)
+            .add_systems(Startup, (setup_camera, setup_gizmos, setup_controlled_rod))
+            .add_systems(
+                FixedUpdate,
+                (pid_controller_system, rod_physics_system_with_controller).chain(),
+            )
             .add_systems(Update, render_rod_system);
     }
 }
