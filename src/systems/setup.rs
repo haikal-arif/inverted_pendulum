@@ -21,13 +21,13 @@ pub fn setup_gizmos(mut config_store: ResMut<GizmoConfigStore>) {
 
 pub fn setup_controlled_rod(mut commands: Commands) {
     commands.spawn((
-        Rod::new(1.0, 1.0, FRAC_PI_4, 0.0),
+        Rod::new(1.0, 1.0, FRAC_PI_4, 0.1),
         PidController::new(
-            5.0,
+            4.0,
             0.0,
             PidGains {
                 kp: 7.0,
-                ki: 0.3,
+                ki: 0.5,
                 kd: 4.0,
             },
             PidState::default(),
