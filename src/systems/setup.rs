@@ -1,4 +1,4 @@
-use std::f32::consts::{FRAC_PI_4, PI};
+use std::f32::consts::FRAC_PI_4;
 
 use crate::components::{ControlTorque, PidController, PidGains, PidState, Rod};
 use bevy::prelude::*;
@@ -12,16 +12,23 @@ pub fn setup_gizmos(mut config_store: ResMut<GizmoConfigStore>) {
     config.line.width = 4.0;
 }
 
+// Some Early PID Data
+// Ku = 5
+// Tu = 6
+// => Kp = 0.6 * 5 = 3
+// => Ki = 1.2 * 5 / 6 = 1
+// => Kd = 0.075 * 5 * 6 = 2.25
+
 pub fn setup_controlled_rod(mut commands: Commands) {
     commands.spawn((
-        Rod::new(1.0, 1.0, PI + 0.5, 0.0),
+        Rod::new(1.0, 1.0, FRAC_PI_4, 0.0),
         PidController::new(
-            1.0,
-            PI,
+            5.0,
+            0.0,
             PidGains {
-                kp: 5.0,
-                ki: 1.0,
-                kd: 0.0,
+                kp: 7.0,
+                ki: 0.3,
+                kd: 4.0,
             },
             PidState::default(),
         ),

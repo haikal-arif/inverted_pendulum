@@ -37,7 +37,11 @@ pub fn pid_step(
     let error = target_angle - current_angle;
 
     // Accumulate integral with anti-windup clamping if needed
-    let new_integral = state.integral + error * dt;
+    let new_integral = if error.abs() < 0.2 {
+        state.integral + error * dt
+    } else {
+        state.integral
+    };
 
     // Derivative of error
     let derivative = if dt > 0.0 {
@@ -48,11 +52,10 @@ pub fn pid_step(
 
     // PID torque output: u = Kp*e + Ki*∫e dt + Kd*(de/dt)
     let theoretical_u = (gains.kp * error) + (gains.ki * new_integral) + (gains.kd * derivative);
-    let u = theoretical_u.min(max_torque);
+    let u = (-max_torque).max(theoretical_u.min(max_torque));
     let next_state = PidState {
         integral: new_integral,
         prev_error: error,
     };
-
     (u, next_state)
 }

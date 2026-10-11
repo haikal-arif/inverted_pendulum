@@ -10,13 +10,20 @@ pub fn render_rod_system(query: Query<&Rod>, mut gizmos: Gizmos) {
         let tip = pivot
             + Vec2::new(
                 length_px * rod.state.theta.sin(),
-                -length_px * rod.state.theta.cos(),
+                length_px * rod.state.theta.cos(),
             );
 
         // Draw neutral axis reference line (faint vertical guide)
         gizmos.line_2d(
             pivot,
-            pivot + Vec2::new(0.0, -length_px * 1.1),
+            pivot + Vec2::new(0.0, length_px * 1.1),
+            Color::srgba(1.0, 1.0, 1.0, 0.15),
+        );
+
+        // faint horizontal limit
+        gizmos.line_2d(
+            pivot + Vec2::new(-length_px * 0.6, 0.0),
+            pivot + Vec2::new(length_px * 0.6, 0.0),
             Color::srgba(1.0, 1.0, 1.0, 0.15),
         );
 

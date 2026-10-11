@@ -1,3 +1,5 @@
+use std::{f32::consts::FRAC_PI_2, time::UNIX_EPOCH};
+
 use crate::components::{ControlTorque, Rod};
 use bevy::prelude::*;
 
@@ -5,7 +7,7 @@ use bevy::prelude::*;
 pub fn get_total_acceleration(theta: f32, u: f32, mass: f32, length: f32) -> f32 {
     // TODO: extract G into config
     const G: f32 = 9.81;
-    let gravity_acc = -(3.0 * G / (2.0 * length)) * theta.sin();
+    let gravity_acc = (3.0 * G / (2.0 * length)) * theta.sin();
     let control_acc = (3.0 * u) / (mass * length.powi(2));
 
     gravity_acc + control_acc
@@ -51,7 +53,13 @@ pub fn rod_physics_system_with_controller(
             dt,
         );
 
-        rod.state.theta = new_theta;
+        if new_theta_dot > 0.0 && rod.state.theta_dot <= 0.0 {
+            let start = std::time::SystemTime::now();
+            let since_epoch = start.duration_since(UNIX_EPOCH).unwrap();
+            println!("One wave reached time: {:?}", since_epoch);
+            println!("Amplitude: {:?}", new_theta);
+        }
+        rod.state.theta = (-FRAC_PI_2).max(new_theta.min(FRAC_PI_2));
         rod.state.theta_dot = new_theta_dot;
     }
 }
